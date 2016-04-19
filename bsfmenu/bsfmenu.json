@@ -1,0 +1,95 @@
+[
+   {
+      "name" : "Integration",
+      "children" : [
+         { "name" : "PrimeFaces", "colour": "#e1e1e1", "href" : "#" },
+         { "name" : "OmniFaces", "colour": "#e1e1e1", "href" : "#" },
+         { "name" : "ButterFaces", "colour": "#e1e1e1", "href" : "#" }
+      ]
+   },
+   {
+      "name" : "Layout",
+      "children" : [
+         { "name" : "Basic Layout & Grid", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Simplified Grid", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Mobile support", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Themes", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "RTL (Right-To-Left)", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "CSS, JS and CDNs", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Sidebars", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Menus", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Navigation and Ajax", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Panels", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Grids", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Icons", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Image", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Jumbotron", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Wells", "colour": "#a5e7ff", "href" : "#" },
+         { "name" : "Canvas", "colour": "#a5e7ff", "href" : "#" }
+      ]
+   },
+   {
+      "name" : "Forms",
+      "children" : [
+         { "name" : "AJAX", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "BlockUI", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Search Expressions", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Custom Search Expressions", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Buttons", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Button Groups and Toolbar", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Command Button", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "DataTable", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Fetch Bean Infos", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Input Text", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Input Secret", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "TextArea", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "ColorPicker", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Checkbox", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Switch", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Combobox", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Multiple choice combo", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Poll", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Messages", "colour": "#8efa80", "href" : "#"  },
+         { "name" : "Growl", "colour": "#8efa80", "href" : "#"  }
+      ]
+   },
+   {
+      "name" : "Bootstrap Widget",
+      "children" : [
+         { "name" : "Alerts", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Carousel", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "DropButton", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Labels and Badges", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Modals", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "ProgressBar", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Thumbnails", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Tab", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Tooltip", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "Tree", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "ScrollUp", "colour": "#ffa991", "href" : "#"  },
+         { "name" : "ScrollSpy", "colour": "#ffa991", "href" : "#"  }
+      ]
+   },
+   {
+      "name" : "Jquery UI Widget",
+      "children" : [
+         { "name" : "Sliders", "colour": "#ffbe56", "href" : "#"  },
+         { "name" : "More Sliders", "colour": "#ffbe56", "href" : "#"  },
+         { "name" : "DatePicker", "colour": "#ffbe56", "href" : "#"  }
+      ]
+   },
+   {
+      "name" : "Mobile",
+      "children" : [
+         { "name" : "Shake", "colour": "#eae852", "href" : "#"  },
+         { "name" : "Gyroscope", "colour": "#eae852", "href" : "#"  },
+         { "name" : "Touch and Swipe", "colour": "#eae852", "href" : "#"  },
+         { "name" : "Pinch", "colour": "#eae852", "href" : "#"  }
+      ]
+   },
+   {
+      "name" : "Examples",
+      "colour" : "#ffbdff",
+      "href" : "http://www.libero.it"
+   }
+]
