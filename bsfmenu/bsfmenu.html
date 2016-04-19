@@ -5,7 +5,21 @@
       <title>BootsFaces Test Menu</title>
       <meta name="description" content="Bootsfaces Test Menu">
       <style>
+      html, body {
+          margin: 0;
+          padding: 0;
+          min-height: 100%;
+          width: 100%;
+          height: 100%;
+      }
       #vis {
+         margin: auto;
+         text-align: center;
+
+         min-height: 80%;
+         min-width: 80%;
+      }
+      #vis-item {
          margin: auto;
          text-align: center;
       }
@@ -28,12 +42,21 @@
    </head>
    <body>
 
+      <div id="vis-item">&nbsp;</div>
       <div id="vis">&nbsp;</div>
 
       <script>
+         /**
+          * Draw the main wheel
+          */
          function drawWheel() {
-            var width = $(window).width();
-            var height = $(window).height() ;
+            // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
+            var b = {
+              w: 175, h: 30, s: 3, t: 10
+            };
+
+            var width = $('#vis').width();
+            var height = $('#vis').height() ;
 
             // get max square size
             if(width >= height) {
@@ -44,10 +67,12 @@
                height = width;
             }
 
+            initializeBreadcrumbTrail();
+
             // set radius
             var radius = width / 2,
                x = d3.scale.linear().range([0, 2 * Math.PI]),
-               y = d3.scale.pow().exponent(1).domain([0, 1]).range([0, radius]), // 1.3
+               y = d3.scale.pow().exponent(1.1).domain([0, 1]).range([0, radius]), // 1.3
                padding = 5,
                duration = 1000;
 
@@ -120,9 +145,10 @@
                // Fade all but the current sequence, and show it in the breadcrumb trail.
                function mouseover(d) {
                   var sequenceArray = getAncestors(d);
+                  updateBreadcrumbs(sequenceArray);
 
                   // Fade all the segments.
-                  d3.selectAll("path").style("opacity", 0.3);
+                  d3.selectAll("path").style("opacity", 0.5);
 
                   // Then highlight only those that are an ancestor of the current segment.
                   vis.selectAll("path")
@@ -134,6 +160,9 @@
                function mouseleave(d) {
                   // Deactivate all segments during transition.
                   d3.selectAll("path").on("mouseover", null);
+
+                  // Hide the breadcrumb trail
+                  d3.select("#trail").style("visibility", "hidden");
 
                   // Transition each segment to full opacity and then reactivate it.
                   d3.selectAll("path")
@@ -195,7 +224,7 @@
                .attr('width', centerPath[0].getBBox().width)
                .attr('height', centerPath[0].getBBox().width)
                .append("image")
-               .attr("xlink:href", "images/BsfSticker.png")
+               .attr("xlink:href", "images/BsfLogo.png")
                .attr('x', 0)
                .attr('y', 0)
                .attr('width', centerPath[0].getBBox().width)
@@ -265,6 +294,69 @@
          // http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
          function brightness(rgb) {
             return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
+         }
+
+         // Initialize the breadcrumb trail
+         function initializeBreadcrumbTrail() {
+           // Add the svg area.
+           var trail = d3.select("#vis-item").append("svg:svg")
+               .attr("width", width)
+               .attr("height", 50)
+               .attr("id", "trail");
+           // Add the label at the end, for the percentage.
+           trail.append("svg:text")
+               .attr("id", "endlabel")
+               .style("fill", "#000");
+         }
+
+         // Generate a string that describes the points of a breadcrumb polygon.
+         function breadcrumbPoints(d, i) {
+           var points = [];
+           points.push("0,0");
+           points.push(b.w + ",0");
+           points.push(b.w + b.t + "," + (b.h / 2));
+           points.push(b.w + "," + b.h);
+           points.push("0," + b.h);
+           if (i > 0) { // Leftmost breadcrumb; don't include 6th vertex.
+             points.push(b.t + "," + (b.h / 2));
+           }
+           return points.join(" ");
+         }
+
+         // Update the breadcrumb trail to show the current sequence and percentage.
+         function updateBreadcrumbs(nodeArray) {
+
+           // Data join; key function combines name and depth (= position in sequence).
+           var g = d3.select("#trail")
+               .selectAll("g")
+               .data(nodeArray, function(d) { return d.name + d.depth; });
+
+           // Add breadcrumb and label for entering nodes.
+           var entering = g.enter().append("svg:g");
+
+           entering.append("svg:polygon")
+               .attr("points", breadcrumbPoints)
+               .style("fill", colour);
+
+           entering.append("svg:text")
+               .attr("x", (b.w + b.t) / 2)
+               .attr("y", b.h / 2)
+               .attr("dy", "0.35em")
+               .attr("text-anchor", "middle")
+               .text(function(d) { return d.name; });
+
+           // Set position for entering and updating nodes.
+           g.attr("transform", function(d, i) {
+             return "translate(" + i * (b.w + b.s) + ", 0)";
+           });
+
+           // Remove exiting nodes.
+           g.exit().remove();
+
+           // Make the breadcrumb trail visible, if it's hidden.
+           d3.select("#trail")
+               .style("visibility", "");
+
          }
       }
 
