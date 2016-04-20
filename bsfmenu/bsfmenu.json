@@ -1,6 +1,7 @@
 [
    {
       "name" : "Integration",
+      "colour": "#e1e1e1",
       "children" : [
          { "name" : "PrimeFaces", "colour": "#e1e1e1", "href" : "#" },
          { "name" : "OmniFaces", "colour": "#e1e1e1", "href" : "#" },
@@ -9,6 +10,7 @@
    },
    {
       "name" : "Layout",
+      "colour": "#a5e7ff",
       "children" : [
          { "name" : "Basic Layout & Grid", "colour": "#a5e7ff", "href" : "#" },
          { "name" : "Simplified Grid", "colour": "#a5e7ff", "href" : "#" },
@@ -30,6 +32,7 @@
    },
    {
       "name" : "Forms",
+      "colour": "#8efa80",
       "children" : [
          { "name" : "AJAX", "colour": "#8efa80", "href" : "#"  },
          { "name" : "BlockUI", "colour": "#8efa80", "href" : "#"  },
@@ -55,6 +58,7 @@
    },
    {
       "name" : "Bootstrap Widget",
+      "colour": "#ffa991",
       "children" : [
          { "name" : "Alerts", "colour": "#ffa991", "href" : "#"  },
          { "name" : "Carousel", "colour": "#ffa991", "href" : "#"  },
@@ -67,11 +71,12 @@
          { "name" : "Tooltip", "colour": "#ffa991", "href" : "#"  },
          { "name" : "Tree", "colour": "#ffa991", "href" : "#"  },
          { "name" : "ScrollUp", "colour": "#ffa991", "href" : "#"  },
-         { "name" : "ScrollSpy", "colour": "#ffa991", "href" : "#"  }
+         { "name" : "ScrollSpy", "colour": "#ffa991", "href" : "#"  } 
       ]
    },
    {
       "name" : "Jquery UI Widget",
+      "colour": "#ffbe56",
       "children" : [
          { "name" : "Sliders", "colour": "#ffbe56", "href" : "#"  },
          { "name" : "More Sliders", "colour": "#ffbe56", "href" : "#"  },
@@ -80,6 +85,7 @@
    },
    {
       "name" : "Mobile",
+      "colour": "#eae852",
       "children" : [
          { "name" : "Shake", "colour": "#eae852", "href" : "#"  },
          { "name" : "Gyroscope", "colour": "#eae852", "href" : "#"  },

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title>BootsFaces Test Menu</title>
+      <meta name="description" content="Bootsfaces Test Menu">
+      <style>
+      html, body {
+          margin: 0;
+          padding: 0;
+          min-height: 100%;
+          width: 100%;
+          height: 100%;
+      }
+      #vis {
+         margin: auto;
+         text-align: center;
+
+         min-height: 80%;
+         min-width: 80%;
+      }
+      #vis-item {
+         margin: auto;
+         text-align: center;
+      }
+      path {
+        stroke: #FFF;
+        stroke-width: 1.0;
+        cursor: pointer;
+      }
+      text {
+        /*font: 11px sans-serif;*/
+        font-family: 'Open Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        cursor: pointer;
+        color: #999;
+      }
+      </style>
+      <script type="text/javascript" src="js/d3.v3.min.js"></script>
+      <script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
+   </head>
+   <body>
+
+      <div id="vis">&nbsp;</div>
+
+      <script>
+         // global variables
+         var _root;
+         var _currentNodeList;
+
+         /**
+          * Draw the pie
+          */
+         function drawPie() {
+            // determine size
+            var width = $('#vis').width();
+            var height = $('#vis').height();
+            // get max square size
+            if(width >= height) {
+               width = height / 1.1;
+               height = width;
+            } else {
+               width = width / 1.1;
+               height = width;
+            }
+
+            // set radius
+            var radius = width / 2;
+
+            // arc size
+            var arc = d3.svg.arc()
+                .outerRadius(radius - 5)
+                .innerRadius(radius / 2.5);
+
+            // read json data
+            d3.json("bsfmenu.json", function(error, root) {
+               if(_currentNodeList != undefined) updateData(_currentNodeList);
+               else {
+                  _root = root;
+                  _currentNodeList = _root;
+                  updateData(_root);
+               }
+            });
+
+            // update data with new children
+            function updateData(root) {
+               //_root = root;
+               var pie = d3.layout.pie()
+                   .sort(null)
+                   .value(function(d) {
+                       // console.log(d);
+                       if(d.children)
+                           return d.children.length;
+                       else return 2;
+                   });
+
+               $("#vis").empty();
+
+               // define main svg
+               var svg = d3.select("#vis")
+                   .append("svg")
+                   .attr("width", width)
+                   .attr("height", height)
+                   .append("g")
+                   .attr("id", "pieChart")
+                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+               // append defs
+               svg.append("defs")
+                  .append('pattern')
+                  .attr('id', 'bsflogo')
+                  .attr('x', radius / 2.4)
+                  .attr('y', radius / 2.4)
+                  .attr('patternUnits', 'userSpaceOnUse')
+                  .attr('width', radius / 1.2)
+                  .attr('height', radius / 1.2)
+                  .append("image")
+                  .attr("xlink:href", "images/BsfLogo.png")
+                  .attr('x', 0)
+                  .attr('y', 0)
+                  .attr('width', radius / 1.2)
+                  .attr('height', radius / 1.2);
+
+               // append center logo
+               svg.append("circle")
+                  .attr("class", "logo")
+                  .attr("cx", 0)
+                  .attr("cy", 0)
+                  .attr("r", radius / 2.5)
+                  .attr("fill", "url(#bsflogo) white")
+                  .style("z-index", "1233131243")
+                  .on("click", function() {
+                     if(_currentNodeList.name != undefined) {
+                        var parent = findParent(_root, _currentNodeList.name);
+                        console.log(parent);
+                        if(parent != undefined) {
+                           _currentNodeList = parent;
+                           updateData(parent);
+                        }
+                     }
+                  });
+
+               // render data
+               var dataToRender;
+               if(root.children != undefined) dataToRender = root.children;
+               else dataToRender = root;
+
+               var piedata = pie(dataToRender);
+               var path = svg.selectAll("path")
+                   .data(piedata)
+                   .enter()
+                   .append("path")
+                   .on("click", click)
+                   .on("mouseleave", mouseleave)
+                   .on("mouseover", mouseover);
+
+               path.transition()
+                   .duration(500)
+                   .attr("fill", function(d, i) {
+                       return d.data.colour;
+                   })
+                   .transition().duration(500)
+                   .attrTween('d', tweenPie);
+
+
+               // Add rotated text
+               var text = svg.selectAll("text")
+                  .data(piedata)
+                  .enter()
+                  .append("svg:text")
+                  .attr("dy", ".35em")
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#666")
+                  .style("font", "bold 12px Arial")
+                  .style("fill-opacity", 0)
+                  .text(function(d) { return d.data.name; })
+                  .on("click", click);
+
+               text.transition()
+                   .duration(1200)
+                   .style("fill-opacity", function(e) { return 1 })
+                   .attr("transform", function(d) {
+                     d.outerRadius = radius; // Set Outer Coordinate
+                     d.innerRadius = radius / 2; // Set Inner Coordinate
+                     return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+                  });
+
+               // Fade all but the current sequence, and show it in the breadcrumb trail.
+               function mouseover(d) {
+                  // Then highlight only those that are an ancestor of the current segment.
+                  svg.selectAll("path")
+                     .filter(function(node) { return node.data.name === d.data.name; })
+                     .attr("fill", function(node) { console.log(node); return ColorLuminance(node.data.colour, -.1); });
+               }
+
+               // Restore everything to full opacity when moving off the visualization.
+               function mouseleave(d) {
+                  d3.selectAll("path")
+                    .attr("fill", function(node) { return node.data.colour; });
+               }
+
+               // click on leaf node
+               function click(d) {
+                  if(d.data.children != undefined) {
+                     _currentNodeList = d.data;
+                     updateData(_currentNodeList);
+                  } else {
+                     window.location.href = d.data.href;
+                  }
+               }
+            }
+
+            // Computes the angle of an arc, converting from radians to degrees.
+            function angle(d) {
+               var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+               return a > 90 ? a - 180 : a;
+            }
+
+            // Find node parent
+            function findParent(rootNode, currentName) {
+               var itemToCycle;
+
+               // set the correct type for search
+               if($.isArray(rootNode)) itemToCycle = rootNode;
+               else if(rootNode.children != undefined) itemToCycle = rootNode.children;
+               else return;
+
+               // cycle
+               for (var index = 0; index < itemToCycle.length; index++) {
+                  if(itemToCycle[index].name === currentName) {
+                     return rootNode;
+                  } else if(itemToCycle[index].children != undefined) {
+                     var parent = findParent(itemToCycle[index], currentName);
+                     if(parent != undefined) return parent;
+                  }
+               }
+            }
+
+            // Tween animation for pie
+            function tweenPie(finish) {
+                 var start = {
+                         startAngle: 0,
+                         endAngle: 0
+                     };
+                 var i = d3.interpolate(start, finish);
+                 return function(d) { return arc(i(d)); };
+            }
+
+            // Edit color luminance
+            function ColorLuminance(hex, lum) {
+            	// validate hex string
+            	hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            	if (hex.length < 6) {
+            		hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            	}
+            	lum = lum || 0;
+
+            	// convert to decimal and change luminosity
+            	var rgb = "#", c, i;
+            	for (i = 0; i < 3; i++) {
+            		c = parseInt(hex.substr(i*2,2), 16);
+            		c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            		rgb += ("00"+c).substr(c.length);
+            	}
+
+            	return rgb;
+            }
+
+            // http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
+            function brightness(rgb) {
+               return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
+            }
+         }
+
+
+         $(function() {
+            drawPie();
+         });
+
+         $(window).on('resize', function(){
+            $( "#vis" ).empty();
+            drawPie();
+         });
+      </script>
+      <script>
+         if (top != self) top.location.replace(location);
+      </script>
+   </body>
+</html>
