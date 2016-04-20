@@ -36,6 +36,10 @@
         cursor: pointer;
         color: #999;
       }
+      .shadow {
+          -webkit-filter: drop-shadow( 0px 3px 3px rgba(0,0,0,.5) );
+          filter: drop-shadow( 0px 3px 3px rgba(0,0,0,.5) );
+      }
       </style>
       <script type="text/javascript" src="js/d3.v3.min.js"></script>
       <script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
@@ -58,10 +62,10 @@
             var height = $('#vis').height();
             // get max square size
             if(width >= height) {
-               width = height / 1.1;
+               width = height / .9;
                height = width;
             } else {
-               width = width / 1.1;
+               width = width / .9;
                height = width;
             }
 
@@ -69,9 +73,15 @@
             var radius = width / 2;
 
             // arc size
+            var inner = radius / 2;
+            var outer = radius - 4;
+
             var arc = d3.svg.arc()
-                .outerRadius(radius - 5)
-                .innerRadius(radius / 2.5);
+                .outerRadius(outer)
+                .innerRadius(inner);
+            var arcShadow = d3.svg.arc()
+                .outerRadius(inner + 1)
+                .innerRadius(inner - 15);
 
             // read json data
             d3.json("bsfmenu.json", function(error, root) {
@@ -85,7 +95,10 @@
 
             // update data with new children
             function updateData(root) {
-               //_root = root;
+               // empty container
+               $("#vis").empty();
+
+               // define pie
                var pie = d3.layout.pie()
                    .sort(null)
                    .value(function(d) {
@@ -95,13 +108,12 @@
                        else return 2;
                    });
 
-               $("#vis").empty();
-
                // define main svg
                var svg = d3.select("#vis")
                    .append("svg")
                    .attr("width", width)
                    .attr("height", height)
+                   .attr("class", "shadow")
                    .append("g")
                    .attr("id", "pieChart")
                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
@@ -147,10 +159,13 @@
                else dataToRender = root;
 
                var piedata = pie(dataToRender);
-               var path = svg.selectAll("path")
+
+               // base path
+               var path = svg.selectAll("path1")
                    .data(piedata)
                    .enter()
                    .append("path")
+                   .attr("class", "path1")
                    .on("click", click)
                    .on("mouseleave", mouseleave)
                    .on("mouseover", mouseover);
@@ -162,6 +177,29 @@
                    })
                    .transition().duration(500)
                    .attrTween('d', tweenPie);
+
+               // 3d path
+               var pathShadow = svg.selectAll("path2")
+                          .data(piedata)
+                          .enter()
+                          .append("path")
+                          .attr({
+                              class: "path2",
+                              d: arcShadow,
+                              fill: function(d, i) {
+                                  var c = d3.hsl(d.data.colour);
+                                  return d3.hsl((c.h+5), (c.s -.07), (c.l -.15));
+                              }
+                          });
+
+               pathShadow.transition()
+                          .duration(1000)
+                          .attrTween('d', function(d) {
+                              var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+                              return function(t) {
+                                  return arcShadow(interpolate(t));
+                              };
+                          });
 
 
                // Add rotated text
@@ -189,14 +227,14 @@
                // Fade all but the current sequence, and show it in the breadcrumb trail.
                function mouseover(d) {
                   // Then highlight only those that are an ancestor of the current segment.
-                  svg.selectAll("path")
+                  svg.selectAll(".path1")
                      .filter(function(node) { return node.data.name === d.data.name; })
-                     .attr("fill", function(node) { console.log(node); return ColorLuminance(node.data.colour, -.1); });
+                     .attr("fill", function(node) { return ColorLuminance(node.data.colour, -.1); });
                }
 
                // Restore everything to full opacity when moving off the visualization.
                function mouseleave(d) {
-                  d3.selectAll("path")
+                  d3.selectAll(".path1")
                     .attr("fill", function(node) { return node.data.colour; });
                }
 
