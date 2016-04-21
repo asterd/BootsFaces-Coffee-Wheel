@@ -149,6 +149,7 @@
             .attr("text-anchor", "middle")
             .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
             // .style("font", "bold 12px Arial")
+            .style("font-size", (radius / 5))
             .text(function(d) { return d.data.name; })
             .on("click", click)
             .on("mouseleave", mouseleave)
