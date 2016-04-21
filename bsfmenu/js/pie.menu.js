@@ -245,11 +245,17 @@
 
          // click on leaf node
          function click(d) {
-            if(d.data.children != undefined) {
-               _currentNodeList = d.data;
-               updatePieData(_currentNodeList);
+            d3.event.stopPropagation();
+            console.log(d3.event);
+            if(d3.event.type == "touchstart" || d3.event.type == "touchend") {
+               return;
             } else {
-               window.location.href = d.data.href;
+               if(d.data.children != undefined) {
+                  _currentNodeList = d.data;
+                  updatePieData(_currentNodeList);
+               } else {
+                  window.location.href = d.data.href;
+               }
             }
          };
       };
