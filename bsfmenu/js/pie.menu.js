@@ -103,7 +103,7 @@
              .enter()
              .append("path")
              .attr("class", "path1")
-             .on("click", click)
+             .on("dblclick", click)
              .on("mouseleave", mouseleave)
              .on("mouseover", mouseover)
              .on("touchstart", mouseover)
@@ -152,9 +152,11 @@
             .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
             .style("font-size", "12px")
             .text(function(d) { return d.data.name; })
-            .on("click", click)
+            .on("dblclick", click)
             .on("mouseleave", mouseleave)
-            .on("mouseover", mouseover);
+            .on("mouseover", mouseover)
+            .on("touchstart", mouseover)
+            .on("touchend", mouseleave);
 
          text.transition()
              .duration(1200)
@@ -226,7 +228,6 @@
 
          // Fade all but the current sequence, and show it in the breadcrumb trail.
          function mouseover(d) {
-            d3.event.stopPropagation();
             // Then highlight only those that are an ancestor of the current segment.
             svg.selectAll(".path1")
                .filter(function(node) { return node.data.name === d.data.name; })
@@ -237,7 +238,6 @@
 
          // Restore everything to full opacity when moving off the visualization.
          function mouseleave(d) {
-            d3.event.stopPropagation();
             d3.selectAll(".path1")
               .attr("fill", function(node) { return node.data.colour; });
             hideCenterText();
@@ -245,17 +245,11 @@
 
          // click on leaf node
          function click(d) {
-            d3.event.stopPropagation();
-            console.log(d3.event);
-            if(d3.event.type == "touchstart" || d3.event.type == "touchend") {
-               return;
+            if(d.data.children != undefined) {
+               _currentNodeList = d.data;
+               updatePieData(_currentNodeList);
             } else {
-               if(d.data.children != undefined) {
-                  _currentNodeList = d.data;
-                  updatePieData(_currentNodeList);
-               } else {
-                  window.location.href = d.data.href;
-               }
+               window.location.href = d.data.href;
             }
          };
       };
