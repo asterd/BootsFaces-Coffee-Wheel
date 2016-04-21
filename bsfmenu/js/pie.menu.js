@@ -105,7 +105,9 @@
              .attr("class", "path1")
              .on("click", click)
              .on("mouseleave", mouseleave)
-             .on("mouseover", mouseover);
+             .on("mouseover", mouseover)
+             .on("touchstart", mouseover)
+             .on("touchend", mouseleave);
 
          path.transition()
              .duration(500)
