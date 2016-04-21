@@ -42,6 +42,7 @@
       }
       </style>
       <script type="text/javascript" src="js/d3.v3.min.js"></script>
+      <script type="text/javascript" src="js/d3plus.customized.min.js"></script>
       <script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
    </head>
    <body>
@@ -56,7 +57,7 @@
          /**
           * Draw the pie
           */
-         function drawPie() {
+         function drawPie(in3Dmode = false) {
             // determine size
             var width = $('#vis').width();
             var height = $('#vis').height();
@@ -89,12 +90,12 @@
                else {
                   _root = root;
                   _currentNodeList = _root;
-                  updateData(_root);
+                  updateData(_root, in3Dmode);
                }
             });
 
             // update data with new children
-            function updateData(root) {
+            function updateData(root, mode3D = false) {
                // empty container
                $("#vis").empty();
 
@@ -113,7 +114,7 @@
                    .append("svg")
                    .attr("width", width)
                    .attr("height", height)
-                   .attr("class", "shadow")
+                   .attr("class", mode3D ? "shadow" : "")
                    .append("g")
                    .attr("id", "pieChart")
                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
@@ -121,36 +122,21 @@
                // append defs
                svg.append("defs")
                   .append('pattern')
-                  .attr('id', 'bsflogo')
-                  .attr('x', radius / 2.4)
-                  .attr('y', radius / 2.4)
-                  .attr('patternUnits', 'userSpaceOnUse')
-                  .attr('width', radius / 1.2)
-                  .attr('height', radius / 1.2)
+                  .attr( {
+                               id: 'bsflogo',
+                                x: radius / 2.4,
+                                y: radius / 2.4,
+                     patternUnits: 'userSpaceOnUse',
+                            width: radius / 1.2,
+                           height: radius / 1.2
+                  })
                   .append("image")
                   .attr("xlink:href", "images/BsfLogo.png")
-                  .attr('x', 0)
-                  .attr('y', 0)
-                  .attr('width', radius / 1.2)
-                  .attr('height', radius / 1.2);
-
-               // append center logo
-               svg.append("circle")
-                  .attr("class", "logo")
-                  .attr("cx", 0)
-                  .attr("cy", 0)
-                  .attr("r", radius / 2.5)
-                  .attr("fill", "url(#bsflogo) white")
-                  .style("z-index", "1233131243")
-                  .on("click", function() {
-                     if(_currentNodeList.name != undefined) {
-                        var parent = findParent(_root, _currentNodeList.name);
-                        console.log(parent);
-                        if(parent != undefined) {
-                           _currentNodeList = parent;
-                           updateData(parent);
-                        }
-                     }
+                  .attr( {
+                                  x: 0,
+                                  y: 0,
+                              width: radius / 1.2,
+                             height: radius / 1.2
                   });
 
                // render data
@@ -179,27 +165,29 @@
                    .attrTween('d', tweenPie);
 
                // 3d path
-               var pathShadow = svg.selectAll("path2")
-                          .data(piedata)
-                          .enter()
-                          .append("path")
-                          .attr({
-                              class: "path2",
-                              d: arcShadow,
-                              fill: function(d, i) {
-                                  var c = d3.hsl(d.data.colour);
-                                  return d3.hsl((c.h+5), (c.s -.07), (c.l -.15));
-                              }
-                          });
+               if(mode3D) {
+                  var pathShadow = svg.selectAll("path2")
+                             .data(piedata)
+                             .enter()
+                             .append("path")
+                             .attr({
+                                 class: "path2",
+                                 d: arcShadow,
+                                 fill: function(d, i) {
+                                     var c = d3.hsl(d.data.colour);
+                                     return d3.hsl((c.h+5), (c.s -.07), (c.l -.15));
+                                 }
+                             });
 
-               pathShadow.transition()
-                          .duration(1000)
-                          .attrTween('d', function(d) {
-                              var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
-                              return function(t) {
-                                  return arcShadow(interpolate(t));
-                              };
-                          });
+                  pathShadow.transition()
+                             .duration(1000)
+                             .attrTween('d', function(d) {
+                                 var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+                                 return function(t) {
+                                     return arcShadow(interpolate(t));
+                                 };
+                             });
+               }
 
 
                // Add rotated text
@@ -209,11 +197,12 @@
                   .append("svg:text")
                   .attr("dy", ".35em")
                   .attr("text-anchor", "middle")
-                  .attr("fill", "#666")
+                  .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
                   .style("font", "bold 12px Arial")
-                  .style("fill-opacity", 0)
                   .text(function(d) { return d.data.name; })
-                  .on("click", click);
+                  .on("click", click)
+                  .on("mouseleave", mouseleave)
+                  .on("mouseover", mouseover);
 
                text.transition()
                    .duration(1200)
@@ -224,18 +213,82 @@
                      return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
                   });
 
+               // append center logo
+               svg.append("circle")
+                  .attr("class", "logo")
+                  .attr("id", "item-logo")
+                  .attr("cx", 0)
+                  .attr("cy", 0)
+                  .attr("r", radius / 2.5)
+                  .attr("fill", "url(#bsflogo) white")
+                  .style("z-index", "1233131243")
+                  .on("click", function() {
+                     if(_currentNodeList.name != undefined) {
+                        var parent = findParent(_root, _currentNodeList.name);
+                        console.log(parent);
+                        if(parent != undefined) {
+                           _currentNodeList = parent;
+                           updateData(parent, mode3D);
+                        }
+                     }
+                  });
+               addCenterText("");
+
+               // Function to add a center text
+               function addCenterText(text) {
+                    if($('#info-text').length > 0) {
+                       d3.select("#info-text").text(text);
+                    } else {
+                       svg.append('text')
+                          .text(text)
+                          .attr({
+                              'text-anchor' : 'middle',
+                                         id : 'info-text'
+                          })
+                          .style({
+                              fill : '#666'
+                          });
+                    }
+
+                    // Wrap text in a circle, and size the text to fit.
+                    if(text != "") {
+                       $('#bsflogo').hide();
+                       $('#info-text').show();
+
+                       d3plus.textwrap()
+                         .container(d3.select("#info-text"))
+                         .resize(true)
+                         .padding(5)
+                         .align("middle")
+                         .valign("middle")
+                         .draw();
+
+                    } else {
+                       $('#info-text').hide();
+                    }
+               }
+
+               // hide the center text
+               function hideCenterText() {
+                  $('#info-text').hide();
+                  $('#bsflogo').show();
+               }
+
                // Fade all but the current sequence, and show it in the breadcrumb trail.
                function mouseover(d) {
                   // Then highlight only those that are an ancestor of the current segment.
                   svg.selectAll(".path1")
                      .filter(function(node) { return node.data.name === d.data.name; })
-                     .attr("fill", function(node) { return ColorLuminance(node.data.colour, -.1); });
+                     .attr("fill", function(node) { return d3plus.color.lighter(node.data.colour, -0.4); });
+
+                  addCenterText(d.data.name);
                }
 
                // Restore everything to full opacity when moving off the visualization.
                function mouseleave(d) {
                   d3.selectAll(".path1")
                     .attr("fill", function(node) { return node.data.colour; });
+                  hideCenterText();
                }
 
                // click on leaf node
@@ -284,41 +337,15 @@
                  var i = d3.interpolate(start, finish);
                  return function(d) { return arc(i(d)); };
             }
-
-            // Edit color luminance
-            function ColorLuminance(hex, lum) {
-            	// validate hex string
-            	hex = String(hex).replace(/[^0-9a-f]/gi, '');
-            	if (hex.length < 6) {
-            		hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-            	}
-            	lum = lum || 0;
-
-            	// convert to decimal and change luminosity
-            	var rgb = "#", c, i;
-            	for (i = 0; i < 3; i++) {
-            		c = parseInt(hex.substr(i*2,2), 16);
-            		c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-            		rgb += ("00"+c).substr(c.length);
-            	}
-
-            	return rgb;
-            }
-
-            // http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
-            function brightness(rgb) {
-               return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
-            }
          }
 
-
          $(function() {
-            drawPie();
+            drawPie(true);
          });
 
          $(window).on('resize', function(){
             $( "#vis" ).empty();
-            drawPie();
+            drawPie(true);
          });
       </script>
       <script>
