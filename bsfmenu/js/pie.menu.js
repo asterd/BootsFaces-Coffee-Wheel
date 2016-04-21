@@ -96,6 +96,7 @@
          else dataToRender = root;
 
          var piedata = pie(dataToRender);
+         var onMobile = imOnMobile();
 
          // base path
          var path = svg.selectAll("path1")
@@ -103,7 +104,7 @@
              .enter()
              .append("path")
              .attr("class", "path1")
-             .on("dblclick", click)
+             .on(onMobile ? "dblclick": "click", click)
              .on("mouseleave", mouseleave)
              .on("mouseover", mouseover)
              .on("touchstart", mouseover)
@@ -152,7 +153,7 @@
             .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
             .style("font-size", "12px")
             .text(function(d) { return d.data.name; })
-            .on("dblclick", click)
+            .on(onMobile ? "dblclick": "click", click)
             .on("mouseleave", mouseleave)
             .on("mouseover", mouseover)
             .on("touchstart", mouseover)
@@ -289,6 +290,16 @@
            var i = d3.interpolate(start, finish);
            return function(d) { return arc(i(d)); };
       };
+
+      // Detect mobile browser
+      function imOnMobile() {
+         if (/iP(hone|od)|android.+mobile|BlackBerry|IEMobile/i.test(navigator.userAgent)) {
+             return true;
+         } else if (/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i.test(navigator.userAgent)) {
+             return true;
+         }
+         return false;
+      }
    };
 
 
