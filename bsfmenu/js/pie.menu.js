@@ -226,6 +226,7 @@
 
          // Fade all but the current sequence, and show it in the breadcrumb trail.
          function mouseover(d) {
+            d3.event.stopPropagation();
             // Then highlight only those that are an ancestor of the current segment.
             svg.selectAll(".path1")
                .filter(function(node) { return node.data.name === d.data.name; })
@@ -236,6 +237,7 @@
 
          // Restore everything to full opacity when moving off the visualization.
          function mouseleave(d) {
+            d3.event.stopPropagation();
             d3.selectAll(".path1")
               .attr("fill", function(node) { return node.data.colour; });
             hideCenterText();
