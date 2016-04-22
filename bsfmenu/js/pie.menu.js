@@ -1,11 +1,13 @@
 (function ($, window, document) {
    'use strict';
 
+   // main svg and options item
+   var svg, o;
 
    // Main function
    $.fn.pieMenu = function (options) {
       // settings
-      var o = $.fn.pieMenu.settings = $.extend({}, $.fn.pieMenu.defaults, options)
+      o = $.fn.pieMenu.settings = $.extend({}, $.fn.pieMenu.defaults, options)
 
       // global variables
       var _root;
@@ -50,6 +52,7 @@
       function updatePieData(root) {
          // empty container
          $('#' + o.containerID).empty();
+         $('#' + o.containerID).disableSelection();
 
          // define pie
          var pie = d3.layout.pie()
@@ -61,8 +64,10 @@
              });
 
          // define main svg
-         var svg = d3.select('#' + o.containerID)
+         svg = d3.select('#' + o.containerID)
              .append("svg")
+             .attr("preserveAspectRatio", "xMidYMid")
+             .attr("viewBox", "0 0 " + width + " " + height)
              .attr( { width: width, height: height, class: o.render3D ? 'shadow':''})
              .append("g")
              .attr("id", "pieChart")
@@ -302,6 +307,25 @@
       }
    };
 
+   // Resize function
+   $.fn.pieMenu.resize = function () {
+      $('#' + o.containerID).empty();
+      $.pieMenu(o);
+   };
+
+   // Disable selection on mobile
+   $.fn.extend({
+       disableSelection: function() {
+           this.each(function() {
+               this.onselectstart = function() {
+                   return false;
+               };
+               this.unselectable = "on";
+               $(this).css('-moz-user-select', 'none');
+               $(this).css('-webkit-user-select', 'none');
+           });
+       }
+   });
 
    // Defaults
    $.fn.pieMenu.defaults = {
