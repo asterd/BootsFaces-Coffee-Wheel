@@ -1,17 +1,13 @@
 (function ($, window, document) {
    'use strict';
 
-   // main svg and options item
-   var svg, o;
+   // global variables
+   var svg, o, _root, _currentNodeList;
 
    // Main function
    $.fn.pieMenu = function (options) {
       // settings
       o = $.fn.pieMenu.settings = $.extend({}, $.fn.pieMenu.defaults, options)
-
-      // global variables
-      var _root;
-      var _currentNodeList;
 
       // determine size
       var width = $('#' + o.containerID).width();
@@ -41,7 +37,7 @@
 
       // read json data
       d3.json(o.jsonUrl, function(error, root) {
-         if(_currentNodeList != undefined) updateData(_currentNodeList);
+         if(_currentNodeList != undefined) updatePieData(_currentNodeList);
          else {
             _root = root;
             _currentNodeList = _root;
@@ -153,8 +149,9 @@
          var text = svg.selectAll("text").data(piedata);
          var textEnter = text.enter().append("svg:text")
                               .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
+                              .style("font-size", "1em")
                               .attr("text-anchor", "middle")
-                              .attr("dy", ".35em")
+                              .attr("dy", ".2em")
                               .on(onMobile ? "dblclick": "click", click)
                               .on("mouseleave", mouseleave)
                               .on("mouseover", mouseover)
