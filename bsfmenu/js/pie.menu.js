@@ -29,7 +29,8 @@
       // set sizes
       var radius = width / 2,
           arcInner = radius / 2,
-          arcOuter = radius - 4;
+          arcOuter = radius - 4,
+          padding = 5;
 
       var arc = d3.svg.arc()
           .outerRadius(arcOuter)
@@ -148,30 +149,34 @@
                        });
          }
 
-         // Add rotated text
-         var text = svg.selectAll("text")
-            .data(piedata)
-            .enter()
-            .append("svg:text")
-            .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
-            .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
-            .style("font-size", "12px")
-            .text(function(d) { return d.data.name; })
-            .on(onMobile ? "dblclick": "click", click)
-            .on("mouseleave", mouseleave)
-            .on("mouseover", mouseover)
-            .on("touchstart", mouseover)
-            .on("touchend", mouseleave);
+         // add text
+         var text = svg.selectAll("text").data(piedata);
+         var textEnter = text.enter().append("svg:text")
+                              .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
+                              .attr("text-anchor", "middle")
+                              .attr("dy", ".35em")
+                              .on(onMobile ? "dblclick": "click", click)
+                              .on("mouseleave", mouseleave)
+                              .on("mouseover", mouseover)
+                              .on("touchstart", mouseover)
+                              .on("touchend", mouseleave);
+         textEnter.append("tspan")
+                  .attr("x", 0)
+                  .text(function(d) { var str = easySplit(d.data.name, 2); return str[0]; }); //d.data.name.split(" ")[0]; });
+         textEnter.append("tspan")
+                  .attr("x", 0)
+                  .attr("dy", "1em")
+                  .text(function(d) { var str = easySplit(d.data.name, 2); return str[1]; }); //return d.data.name.split(" ")[1]; });
 
-         text.transition()
-             .duration(1200)
-             .style("fill-opacity", function(e) { return 1 })
-             .attr("transform", function(d) {
-               d.outerRadius = radius; // Set Outer Coordinate
-               d.innerRadius = radius / 2; // Set Inner Coordinate
-               return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
-            });
+         textEnter.transition()
+                  .duration(1200)
+                  .style("fill-opacity", function(e) { return 1 })
+                  .attr("transform", function(d) {
+                     d.outerRadius = radius; // Set Outer Coordinate
+                     d.innerRadius = radius / 2; // Set Inner Coordinate
+                     return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+                  })
+
 
          // append center logo
          svg.append("circle")
@@ -191,6 +196,25 @@
                }
             });
          addCenterText("");
+
+         // split string in two parts balanced
+         function easySplit(str, maxChunks) {
+            var parts = str.split(" ");
+            if(parts.length <= 2) return parts;
+            else {
+               var _len = str.length / 2;
+               var newParts = [ "", "" ];
+               var idxToAdd = 0;
+               for(var i = 0; i < parts.length; i++) {
+                  newParts[idxToAdd] = newParts[idxToAdd] + " " + parts[i];
+                  if(newParts[idxToAdd].length > _len || i == parts.length - 2) {
+                     idxToAdd++;
+                     if(idxToAdd >= (maxChunks - 1)) idxToAdd = maxChunks - 1;
+                  }
+               }
+               return newParts;
+            }
+         }
 
          // Function to add a center text
          function addCenterText(text) {
