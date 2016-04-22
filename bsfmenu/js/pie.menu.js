@@ -63,8 +63,8 @@
          // define main svg
          svg = d3.select('#' + o.containerID)
              .append("svg")
-             .attr("preserveAspectRatio", "xMidYMid")
-             .attr("viewBox", "0 0 " + width + " " + height)
+             //.attr("preserveAspectRatio", "xMidYMid")
+             //.attr("viewBox", "0 0 " + width + " " + height)
              .attr( { width: width, height: height, class: o.render3D ? 'shadow':''})
              .append("g")
              .attr("id", "pieChart")
@@ -149,7 +149,7 @@
          var text = svg.selectAll("text").data(piedata);
          var textEnter = text.enter().append("svg:text")
                               .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
-                              .style("font-size", "1em")
+                              .style("font-size", "1rem")
                               .attr("text-anchor", "middle")
                               .attr("dy", ".2em")
                               .on(onMobile ? "dblclick": "click", click)
