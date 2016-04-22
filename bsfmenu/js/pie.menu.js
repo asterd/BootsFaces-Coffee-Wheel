@@ -45,6 +45,20 @@
          }
       });
 
+      // add media query resize rule
+      if($("#pie-resize").length <= 0) {
+         $("<style>")
+            .prop("type", "text/css")
+            .prop("id", "pie-resize")
+            .html("\
+             @media screen and (max-width:520px) {\
+                 .s-text {\
+                    font-size: 2.5vw !important;\
+                 }\
+             }")
+             .appendTo("head");
+       }
+
       // internal functions
       function updatePieData(root) {
          // empty container
@@ -149,7 +163,8 @@
          var text = svg.selectAll("text").data(piedata);
          var textEnter = text.enter().append("svg:text")
                               .attr("fill", function(d) { return d3plus.color.text(d.data.colour); })
-                              .style("font-size", "1rem")
+                              .attr("class", "s-text")
+                              .style("font-size", "1.5vw")
                               .attr("text-anchor", "middle")
                               .attr("dy", ".2em")
                               .on(onMobile ? "dblclick": "click", click)
@@ -172,8 +187,7 @@
                      d.outerRadius = radius; // Set Outer Coordinate
                      d.innerRadius = radius / 2; // Set Inner Coordinate
                      return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
-                  })
-
+                  });
 
          // append center logo
          svg.append("circle")
@@ -344,6 +358,10 @@
                this.unselectable = "on";
                $(this).css('-moz-user-select', 'none');
                $(this).css('-webkit-user-select', 'none');
+               $(this).css('-ms-user-select', 'none');
+               $(this).css('-o-user-select', 'none');
+               $(this).css('user-select', 'none');
+               $(this).css('-webkit-tap-highlight-color', 'rgba(0,0,0,0)');
            });
        }
    });
