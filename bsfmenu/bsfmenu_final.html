@@ -54,9 +54,10 @@
             $.pieMenu({ jsonUrl: 'bsfmenu.json', logoUrl: 'images/BsfLogo.png', render3D: true });
          });
 
-         $(window).on('resize', function(){
-            $( "#vis" ).empty();
-            $.pieMenu({ jsonUrl: 'bsfmenu.json', logoUrl: 'images/BsfLogo.png', render3D: true });
+         $(window).on('resize', function() {
+            //$( "#vis" ).empty();
+            //$.pieMenu({ jsonUrl: 'bsfmenu.json', logoUrl: 'images/BsfLogo.png', render3D: true });
+            $.pieMenu.resize();
          });
       </script>
    </body>
